@@ -1,0 +1,6 @@
+framework module Pods_WagChallengeObjectiveC {
+  umbrella header "Pods-WagChallengeObjectiveC-umbrella.h"
+
+  export *
+  module * { export * }
+}
