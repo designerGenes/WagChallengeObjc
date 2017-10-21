@@ -17,11 +17,13 @@
 static UserTableViewDataSource *sharedInstance;
 + (UserTableViewDataSource *) sharedInstance { @synchronized(self) { return sharedInstance; } }
 + (void) setSharedInstance:(UserTableViewDataSource *)val { @synchronized(self) { sharedInstance = val; } }
+
 - (void) didReceiveUserList :(NSArray<User *> *) userList inController:(RemoteDataController *) controller {
     self.userList = userList;
     [self.tableView reloadData];
     self.tableView.backgroundView.backgroundColor = self.userList.count % 2 == 0 ? [UIColor initFromNamedColor:gray_0] : [UIColor initFromNamedColor:gray_1];
-    [self.tableView setValue:false forKey:@"isHidden"];
+    
+    
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -36,9 +38,9 @@ static UserTableViewDataSource *sharedInstance;
     UserTableViewCell *userCell = [tableView dequeueReusableCellWithIdentifier:@"UserTableViewCell" forIndexPath:indexPath];
     if (userCell != nil) {
         [userCell adoptUser:[_userList objectAtIndex:indexPath.row]];
-        UIColor *alternatingCellShade = indexPath.row % 2 == 0 ? [UIColor initFromNamedColor:gray_1] : [UIColor initFromNamedColor:gray_0];
-        [userCell.contentView setBackgroundColor:alternatingCellShade];
-        [userCell setUserInteractionEnabled:YES];
+//        UIColor *alternatingCellShade = indexPath.row % 2 == 0 ? [UIColor initFromNamedColor:gray_1] : [UIColor initFromNamedColor:gray_0];
+//        [userCell.contentView setBackgroundColor:alternatingCellShade];
+//        [userCell setUserInteractionEnabled:YES];
         return userCell;
     }
     return [[UITableViewCell alloc] init];
@@ -46,7 +48,9 @@ static UserTableViewDataSource *sharedInstance;
 
 - (void) adoptTableView: (UITableView *) tableView {
     self.tableView = tableView;
-    
+    [tableView registerNib:[UINib nibWithNibName:@"UserTableViewCell" bundle:nil] forCellReuseIdentifier:@"UserTableViewCell"];
+    [tableView setDataSource:self];
+    [tableView setDelegate:self];
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {

@@ -7,6 +7,7 @@
 //
 
 #import "MainViewController.h"
+#import "UserTableViewDataSource.h"
 
 
 @interface MainViewController ()
@@ -28,20 +29,10 @@
     [super viewDidLoad];
     _contentLoadingLabel = [[UILabel alloc] init];
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleWhite)];
-    
+    [[UserTableViewDataSource sharedInstance] adoptTableView:_tableView];
     // Do any additional setup after loading the view, typically from a nib.
 }
 
--(void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-}
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 
 @end

@@ -9,8 +9,8 @@
 #import "RemoteDataController.h"
 #import "AFNetworking/AFNetworking.h"
 #import "SBJson5/SBJson5.h"
+#import "User.h"
 @class User;
-
 
 NSString* BASE_URL_STRING = @"https://api.stackexchange.com/2.2/users?site=stackoverflow";
 
@@ -42,7 +42,16 @@ static RemoteDataController *sharedInstance;
 
 // needs callback
 - (void) downloadImageAtURL:(NSURL *) url delegate:(UIImageView *)delegate {
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
     
+    [_sessionManager dataTaskWithRequest: request completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"%@", error.localizedDescription);
+        } else {
+            
+            
+        }
+    }]
 //    [_sessionManager ]
     
 //    if let sessionManager = sessionManager {
@@ -71,46 +80,29 @@ static RemoteDataController *sharedInstance;
 //    }
 }
 
--(void)processData: (NSDictionary*)data {
-    NSArray* items = [[data objectForKey:@"items"] array];
-    NSLog(@"downloaded %i items", items.count);
-//    NSMutableArray<User> userList = [items ]
-    
-//    if let items = resultJSON["items"].array {
-//        print("downloaded \(items.count) JSON user objects ")
-//        // get average reputation.  This method is imperfect because
-//        // we are only comparing against the current page and would be implemented
-//        // differently in a full app
-//        let reputationArr = items.filter({$0["reputation"].int != nil}).map({$0["reputation"].intValue})
-//        let averageRep = reputationArr.reduce(0, {$0 + $1}) / reputationArr.count
-//        User.averageReputation = averageRep
-//        print("average User Reputation is \(averageRep)")
-//
-//        let userList: [User] = items.map({ User(fromJSON: $0) })
-//        print("generated list of \(userList.count) users")
-//        delegate?.didReceiveUserList(list: userList, in: self)
-//
-//    }
-//
-//}
-}
-
 -(void)updateDataWithDelegate:(id<RemoteDataDelegate>)delegate {
     NSLog(@"updating data");
-//    _sessionManager.requestSerializer = [AFJSONRequestSerializer serializer];
     [_sessionManager GET:BASE_URL_STRING parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         if (responseObject != nil) {
             if ([NSJSONSerialization isValidJSONObject:responseObject] == YES) {
                 NSLog(@"it's a real JSON object");
-//                NSLog(@"%@", responseObject);
-                NSError *error;
-                NSMutableDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:&error];
-                NSLog(@"%@", jsonDict);
+                if ([responseObject isKindOfClass:[NSDictionary class]]) {
+                    NSDictionary *jsonDict = responseObject;
+                    
+                    // Process data
+                    NSArray* items = [jsonDict objectForKey:@"items"];
+                    NSLog(@"downloaded %i users", items.count);
+                    
+                    NSMutableArray<User *> *userList = [[NSMutableArray alloc] init];
+                    for (NSDictionary *userDict in items) {
+                        User *newUser = [User initFromJSON:userDict];
+                        [userList addObject:newUser];
+                    }
+                    
+                    [delegate didReceiveUserList:userList inController:self];
+                }
+                
             }
-            
-//            NSDictionary* jsonDict = [NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers
-//                                                                       error:nil];
-//            [self processData:jsonDict];
         }
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {

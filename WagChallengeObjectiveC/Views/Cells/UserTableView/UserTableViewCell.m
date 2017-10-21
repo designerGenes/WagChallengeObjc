@@ -17,7 +17,7 @@
 UIFont *sfBold;
 
 @interface UserTableViewCell ()
-@property (weak, nonatomic) UIActivityIndicatorView *activityIndicator;
+@property (nonatomic) UIActivityIndicatorView *activityIndicator;
 @end
 
 @implementation UserTableViewCell
@@ -91,13 +91,28 @@ UIFont *sfBold;
     return badgeCountAttributedString;
 }
 - (void) drawBadgeCountTextFor: (User *) user {
+
     
+    NSAttributedString *goldString = [[NSAttributedString alloc] initWithString:[
+                                     NSString stringWithFormat:@"%@ ", user.goldCount] attributes:@{NSForegroundColorAttributeName:[UIColor initFromNamedColor:gold]}];
+    
+    NSAttributedString *silverString = [[NSAttributedString alloc] initWithString:[
+                                                                                 NSString stringWithFormat:@"%@ ", user.silverCount] attributes:@{NSForegroundColorAttributeName:[UIColor initFromNamedColor:silver]}];
+    
+    NSAttributedString *bronzeString = [[NSAttributedString alloc] initWithString:[
+                                                                                   NSString stringWithFormat:@"%@", user.bronzeCount] attributes:@{NSForegroundColorAttributeName:[UIColor initFromNamedColor:bronze]}];
+    
+    NSMutableAttributedString *badgeCountString = [[NSMutableAttributedString alloc] initWithAttributedString:goldString];
+    [badgeCountString appendAttributedString:silverString];
+    [badgeCountString appendAttributedString:bronzeString];
+    [_badgeCountLabel setAttributedText:badgeCountString];
 }
 
 
 
 - (void) downloadGravatarFrom: (NSURL *) url {
     self.gravatarImageView.image = nil;
+    [self addSubview:_activityIndicator];
     [_activityIndicator startAnimating];
     
     [[RemoteDataController sharedInstance] downloadImageAtURL:url delegate:_gravatarImageView];
@@ -106,15 +121,13 @@ UIFont *sfBold;
 
 - (void) adoptUser: (User *) user {
     NSMutableAttributedString *displayNameString = [[NSMutableAttributedString alloc] initWithString:user.displayName];
-    [displayNameString addAttribute: NSFontAttributeName
-                       value:sfBold range:NSMakeRange(0, displayNameString.length)];
+
     [displayNameString addAttribute: NSForegroundColorAttributeName
                        value:[UIColor whiteColor] range:NSMakeRange(0, displayNameString.length)];
-
+//
     [_displayNameLabel setAttributedText:displayNameString];
-
+//
     [self drawBadgeCountTextFor:user];
-    [self layoutIconBadgesFor:user];
     [self downloadGravatarFrom:user.gravatarURL];
     
 }
@@ -124,14 +137,16 @@ UIFont *sfBold;
     [super awakeFromNib];
     sfBold = [UIFont fontWithName:@"SanFranciscoDisplay-Bold" size:24];
     _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:(UIActivityIndicatorViewStyleWhite)];
+    
 }
 
 -(void)layoutSubviews {
-    
+    [_activityIndicator setCenter:(_gravatarImageView.center)];
 }
 
 -(void)prepareForReuse {
     [super prepareForReuse];
+    [_activityIndicator removeFromSuperview];
 }
 
 
