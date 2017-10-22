@@ -12,6 +12,7 @@
 #import "UIColor+Convenience.h"
 #import "NSNumber+Convenience.h"
 #import "RemoteDataController.h"
+#import "User.h"
 @import UIKit;
 
 UIFont *sfBold;
@@ -23,7 +24,7 @@ UIFont *sfBold;
 @implementation UserTableViewCell
 
 // RemoteImageDelegate methods
-- (void) didRetrieveRemoteImage :(UIImage *) img :(id *) remoteDataController {
+- (void) didRetrieveRemoteImage :(UIImage *) img inController:(RemoteDataController *) controller {
     
     // needs to be on main async queue
     
@@ -39,9 +40,6 @@ UIFont *sfBold;
 - (void) touchedDownOnBadgeCount: (UIControl *) control {
     NSAttributedString *badgeDescriptionText = [self makeBadgeCountText:@"GOLD" :@"SLVR" :@"BRNZ" :24];
     [_displayNameLabel setAttributedText:badgeDescriptionText];
-}
-- (void) touchedDownOnBadge: (UIControl *) control {
-    
 }
 
 - (void) revealDescriptionForBadge: (IconBadge *) badge {
@@ -114,19 +112,17 @@ UIFont *sfBold;
     self.gravatarImageView.image = nil;
     [self addSubview:_activityIndicator];
     [_activityIndicator startAnimating];
+    [[RemoteDataController sharedInstance] downloadImageAtURL:url into:_gravatarImageView delegate:self];
     
-    [[RemoteDataController sharedInstance] downloadImageAtURL:url delegate:_gravatarImageView];
 
 }
 
 - (void) adoptUser: (User *) user {
     NSMutableAttributedString *displayNameString = [[NSMutableAttributedString alloc] initWithString:user.displayName];
-
     [displayNameString addAttribute: NSForegroundColorAttributeName
                        value:[UIColor whiteColor] range:NSMakeRange(0, displayNameString.length)];
-//
     [_displayNameLabel setAttributedText:displayNameString];
-//
+
     [self drawBadgeCountTextFor:user];
     [self downloadGravatarFrom:user.gravatarURL];
     
@@ -146,6 +142,7 @@ UIFont *sfBold;
 
 -(void)prepareForReuse {
     [super prepareForReuse];
+    [_gravatarImageView setImage:nil];
     [_activityIndicator removeFromSuperview];
 }
 

@@ -21,10 +21,10 @@
     
     NSString *gravatarURLString = [json valueForKey:@"profile_image"];
     [newUser setGravatarURL:[NSURL URLWithString:gravatarURLString]];
-    
-    NSLog(@"created %@ with %@ gold, %@ silver, and %@ bronze medals, and %@ reputation ",
-          newUser.displayName,
-          newUser.goldCount, newUser.silverCount, newUser.bronzeCount, newUser.reputation);
+    NSLog(@"created user with url %@", gravatarURLString);
+//    NSLog(@"created %@ with %@ gold, %@ silver, and %@ bronze medals, and %@ reputation ",
+//          newUser.displayName,
+//          newUser.goldCount, newUser.silverCount, newUser.bronzeCount, newUser.reputation);
     return newUser;
 }
 @end

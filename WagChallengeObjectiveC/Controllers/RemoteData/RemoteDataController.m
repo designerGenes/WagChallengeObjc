@@ -8,6 +8,7 @@
 
 #import "RemoteDataController.h"
 #import "AFNetworking/AFNetworking.h"
+#import "UIKit+AFNetworking.h"
 #import "SBJson5/SBJson5.h"
 #import "User.h"
 @class User;
@@ -41,43 +42,13 @@ static RemoteDataController *sharedInstance;
 }
 
 // needs callback
-- (void) downloadImageAtURL:(NSURL *) url delegate:(UIImageView *)delegate {
+- (void) downloadImageAtURL:(NSURL *) url into:(UIImageView *)imgView delegate:(NSObject<RemoteImageDelegate> *)delegate {
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    
-    [_sessionManager dataTaskWithRequest: request completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable error) {
-        if (error != nil) {
-            NSLog(@"%@", error.localizedDescription);
-        } else {
-            
-            
-        }
-    }]
-//    [_sessionManager ]
-    
-//    if let sessionManager = sessionManager {
-//        let urlRequest = URLRequest(url: url)
-//        if let cachedImg = imageCache.image(for: urlRequest, withIdentifier: url.absoluteString) {
-//            callback?(cachedImg)
-//        } else {
-//            let downloader = ImageDownloader(sessionManager: sessionManager)
-//            activeDownloaders[url] = downloader
-//            downloader.download(urlRequest, filter: nil) { res in
-//                DispatchQueue.main.async {
-//                    guard res.error == nil else {
-//                        print("Error: \(res.error!.localizedDescription)")
-//                        callback?(nil)
-//                        return
-//                    }
-//                    let img = res.result.value
-//                    if let img = img {
-//                        self.imageCache.add(img, for: urlRequest, withIdentifier: url.absoluteString)
-//                    }
-//                    callback?(img)
-//                    self.activeDownloaders[url] = nil
-//                }
-//            }
-//        }
-//    }
+    [imgView setImageWithURLRequest:request placeholderImage:nil success:^(NSURLRequest * _Nonnull request, NSHTTPURLResponse * _Nullable response, UIImage * _Nonnull image) {
+        [delegate didRetrieveRemoteImage:image inController:self];
+    } failure:^(NSURLRequest * _Nonnull request, NSHTTPURLResponse * _Nullable response, NSError * _Nonnull error) {
+        NSLog(@"failed to download img: %@", error.localizedDescription);
+    }];
 }
 
 -(void)updateDataWithDelegate:(id<RemoteDataDelegate>)delegate {

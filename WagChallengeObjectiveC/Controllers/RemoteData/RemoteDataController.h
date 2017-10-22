@@ -14,7 +14,7 @@
 
 @protocol RemoteImageDelegate <NSObject>
 @required
-- (void) didRetrieveRemoteImage :(UIImage *) img :(id *) remoteDataController;
+- (void) didRetrieveRemoteImage :(UIImage *) img inController:(RemoteDataController *) controller;
 @end
 
 @protocol RemoteDataDelegate <NSObject>
@@ -24,7 +24,7 @@
 
 @interface RemoteDataController : NSObject
 
-- (void) downloadImageAtURL:(NSURL *) url delegate:(UIImageView *)delegate;
+- (void) downloadImageAtURL:(NSURL *) url into:(UIImageView *)imgView delegate:(NSObject<RemoteImageDelegate> *)delegate;
 - (void) updateDataWithDelegate: (id <RemoteDataDelegate>) delegate;
 + (RemoteDataController *) sharedInstance;
 + (void) setSharedInstance:(RemoteDataController *)val;
